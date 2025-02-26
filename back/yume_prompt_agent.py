@@ -24,8 +24,6 @@ class YumeService():
         
 
     def _load_llm(self, model_type: str):
-        # if os.getenv('OPENAI_API_KEY'):
-        #     return ChatOpenAI(model='gpt-4o-mini', temperature=0)
         return ChatGoogleGenerativeAI(model=model_type, temperature=0.5,api_key=os.getenv('GOOGLE_API_KEY'))
 
     
