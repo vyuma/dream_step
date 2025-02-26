@@ -1,30 +1,27 @@
-'use client'
+'use client';
 
 import { useState } from 'react';
-// import { useRouter } from 'next/navigation';
-import Head from 'next/head';
+import { useRouter } from 'next/navigation';
 
 export default function Home() {
   const [dream, setDream] = useState('');
-  // const router = useRouter();
+  const router = useRouter();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (dream.trim()) {
+      // App Routerではクエリパラメータの代わりにURLパスかSessionStorageを使う
+      sessionStorage.setItem('dream', dream);
+      router.push('/questions');
     }
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-900 via-purple-700 to-pink-600">
-      <Head>
-        <title>Dream Step | 夢を実現する第一歩</title>
-        <meta name="description" content="AIと対話しながら夢を実現するためのステップを見つけましょう" />
-      </Head>
-
       <main className="container mx-auto px-4 py-16">
         <div className="max-w-2xl mx-auto">
           <div className="text-center mb-12">
-            <h1 className="text-4xl font-bold mb-4 text-white">ドリームリアライザー</h1>
+            <h1 className="text-4xl font-bold mb-4 text-white">Dream Step</h1>
             <p className="text-xl text-purple-100">AIと共に、夢への道筋を明確にしましょう</p>
           </div>
 
