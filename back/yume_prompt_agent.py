@@ -58,19 +58,18 @@ class YumeService():
         chain = prompt_template | self.flash_llm_exp| parser
         result = chain.invoke({"yume_prompt": yume_prompt})
         return result
-    def generate_yume_summary_agent(self,yume_answer):
-        yume_answer = yume_answer["Answer"]
+    def generate_yume_summary_agent(self,yume_answer:list[str]):
+        yume_answer = "\n".join([f"Q: {item['Question']}\nA: {item['Answer']}" for item in yume_answer])
         yume_summary_system_prompt = ChatPromptTemplate.from_template(
             template="""
             あなたは夢を語る人に対してそれの具体化を支援するエージェントです。
             あなたは、夢を具体化するために必要な質問をして次のような回答をユーザーから得ることが出来ました。
             この時に、ユーザーから得た回答をもとに、夢の実現のための要約を作成してください。
             {yume_answer}
-            """,
-            variables = {"yume_answer": yume_answer}
+            """
         )
         chain = yume_summary_system_prompt | self.flash_llm_exp | StrOutputParser()
-        yume_summary = chain.invoke()
+        yume_summary = chain.invoke({"yume_answer": yume_answer})
         return yume_summary
     
     
