@@ -10,6 +10,9 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 - コードレビューも行う。githuにプルリクしたら、自分以外の人が、コードレビューを行う。問題なければマージ
 
 
+
+
+
 ## Getting Started
 
 First, run the development server:
