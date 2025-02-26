@@ -6,9 +6,10 @@ from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 import os
 
+# アプリケーション
+from yume_prompt_agent import YumeService
 
 
-load_dotenv('./.env.local')
 workspace_path = Path("/workspaces/physiquest_animation_generator/backend/media/videos")
 
 class Input(BaseModel):
@@ -41,10 +42,19 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+yume_agent = YumeService()
+
 
 @app.get("/")
 async def root():
     return {"message": "Hello World"}
+
+@app.get("/api/yume_question")
+def generate_yume_question(yume_prompt:str):
+    yume_question = yume_agent.generate_yume_question(yume_prompt)
+    # json形式で返答する
+    return responses.JSONResponse(content=yume_question,media_type="application/json")
+    
 
 
 
