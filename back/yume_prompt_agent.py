@@ -9,6 +9,8 @@ from langchain_core.output_parsers import StrOutputParser
 from langchain.output_parsers import ResponseSchema
 from langchain.output_parsers import ResponseSchema, StructuredOutputParser
 from langchain.prompts import ChatPromptTemplate
+from langchain.agents import AgentExecutor, create_tool_calling_agent
+
 
 
 
@@ -56,7 +58,22 @@ class YumeService():
         chain = prompt_template | self.flash_llm_exp| parser
         result = chain.invoke({"yume_prompt": yume_prompt})
         return result
-    # def generate_yume_summary(self,)
+    def create_yume_summary_agent(self,yume_answer):
+        yume_answer = yume_answer["Answer"]
+        yume_summary_system_prompt = ChatPromptTemplate.from_template(
+            template="""
+            あなたは夢を語る人に対してそれの具体化を支援するエージェントです。
+            あなたは、夢を具体化するために必要な質問をして次のような回答をユーザーから得ることが出来ました。
+            この時に、ユーザーから得た回答をもとに、夢の実現のための要約を作成してください。
+            {yume_answer}
+            """,
+            variables = {"yume_answer": yume_answer}
+        )
+            
+            
+
+        
+        
     
     
     

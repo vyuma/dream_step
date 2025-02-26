@@ -4,6 +4,7 @@ from pydantic import BaseModel
 from pathlib import Path
 from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import StreamingResponse
 import os
 
 # アプリケーション
@@ -18,17 +19,13 @@ class Input(BaseModel):
 class Output(BaseModel):
     output: str
 
-class Prompt(BaseModel):
-    user_prompt: str
-    video_id: str
-    instruction_type: int
+class YumeQA(BaseModel):
+    Question : str
+    Answer : str
 
-class DetailPrompt(BaseModel):
-    user_prompt: str
-    instruction_type: int
+class YumeAnswer(BaseModel):
+    Answer : list[YumeQA]
 
-class Script(BaseModel):
-    script: str
 
 app = FastAPI(title='LangChain Server', version='1.0')
 
@@ -55,7 +52,7 @@ def generate_yume_question(yume_prompt:str):
     # json形式で返答する
     return responses.JSONResponse(content=yume_question,media_type="application/json")
 
-
+ 
 
 
 
