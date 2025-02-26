@@ -58,7 +58,7 @@ class YumeService():
         chain = prompt_template | self.flash_llm_exp| parser
         result = chain.invoke({"yume_prompt": yume_prompt})
         return result
-    def create_yume_summary_agent(self,yume_answer):
+    def generate_yume_summary_agent(self,yume_answer):
         yume_answer = yume_answer["Answer"]
         yume_summary_system_prompt = ChatPromptTemplate.from_template(
             template="""
@@ -69,11 +69,11 @@ class YumeService():
             """,
             variables = {"yume_answer": yume_answer}
         )
-            
-            
-
-        
-        
+        chain = yume_summary_system_prompt | self.flash_llm_exp | StrOutputParser()
+        yume_summary = chain.invoke()
+        return yume_summary
+    
+    
     
     
     

@@ -52,7 +52,11 @@ def generate_yume_question(yume_prompt:str):
     # json形式で返答する
     return responses.JSONResponse(content=yume_question,media_type="application/json")
 
- 
+@app.get("/api/yume_summary")
+def generate_yume_summery(yume_answer:YumeAnswer):
+    result = yume_agent.generate_yume_summary_agent(yume_answer)
+    return result
+
 
 
 
