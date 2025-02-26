@@ -1,5 +1,15 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
+
+## GitHub Rule 
+
+- developにプルリクエストする
+- feature/[機能名] ブランチを切って作業する
+- プルリクエストのタイトルは [機能名] で始める
+- プルリクエストの本文には、作業内容を記載する
+- コードレビューも行う。githuにプルリクしたら、自分以外の人が、コードレビューを行う。問題なければマージ
+
+
 ## Getting Started
 
 First, run the development server:
