@@ -56,7 +56,10 @@ class YumeService():
         chain = prompt_template | self.flash_llm_exp| parser
         result = chain.invoke({"yume_prompt": yume_prompt})
         return result
-        
+    # def generate_yume_summary(self,)
+    
+    
+    
 if __name__ == "__main__":
     yume_service = YumeService()
     output=yume_service.generate_yume_question("幸せになりたい！")

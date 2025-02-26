@@ -54,7 +54,8 @@ def generate_yume_question(yume_prompt:str):
     yume_question = yume_agent.generate_yume_question(yume_prompt)
     # json形式で返答する
     return responses.JSONResponse(content=yume_question,media_type="application/json")
-    
+
+
 
 
 
