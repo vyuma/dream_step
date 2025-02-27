@@ -26,6 +26,9 @@ class YumeQA(BaseModel):
 class YumeAnswer(BaseModel):
     Answer : list[YumeQA]
 
+class YumePrompt(BaseModel):
+    Prompt : str
+
 
 app = FastAPI(title='LangChain Server', version='1.0')
 
@@ -46,9 +49,10 @@ yume_agent = YumeService()
 async def root():
     return {"message": "Hello World"}
 
-@app.get("/api/yume_question")
-async def generate_yume_question(yume_prompt:str):
-    yume_question = yume_agent.generate_yume_question(yume_prompt)
+@app.post("/api/yume_question")
+async def generate_yume_question(yume_prompt:YumePrompt):
+    
+    yume_question = yume_agent.generate_yume_question(yume_prompt.Prompt)
     # json形式で返答する
     return responses.JSONResponse(content=yume_question,media_type="application/json")
 
