@@ -1,3 +1,4 @@
+"use client";
 import React from "react";
 import "./Sakura.css";
 
@@ -41,10 +42,7 @@ const SakuraLoading: React.FC = () => {
               src={image}
               alt=""
               className={`parts_${i + 1}`}
-              style={{
-                left: `${leftPosition}%`,
-                animationDelay: `${delay}s`,
-              }}
+              
             />
           );
         })}

@@ -3,6 +3,10 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
+import  AnswerText from '../components/AnswerText';
+import {Question} from  '../components/AnswerText'
+
+
 type Question = {
   Question: string;
   Answer: string;
@@ -66,25 +70,42 @@ export default function Questions() {
     setAnswers(prev => ({ ...prev, [id]: value }));
   };
 
-  const handleSave = async () => {
-    // 次へ進むボタンが押されたらローディング状態に
-    setProcessingNext(true);
-    
-    // 保存処理
-    sessionStorage.setItem('answers', JSON.stringify(answers));
-    
-    try {
-      // 時間がかかる処理をシミュレート
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      // 分析結果を設定
-      setDreamAnalysis("あなたの夢について具体的な計画を立てるための情報が集まりました...");
-    } catch (error) {
-      console.error("分析生成エラー:", error);
-    } finally {
-      // 処理完了後にローディング状態を解除
-      setProcessingNext(false);
+  const handleSave = () => {
+    // 回答をanswerから取得して、{Question:質問, Answer:回答}の形式に変換
+    const formattedQA = {
+      "Answer": questions.map((q,index)=> {
+        return {
+          "Question": q.Question,
+          "Answer": answers[index]
+        }
+      })
     }
+
+
+    sessionStorage.setItem('answers', JSON.stringify(answers));
+
+    // APIに回答する。
+    const DreamSummary = async () => {
+      setLoading(true);
+      try {
+        const res = await fetch(process.env.NEXT_PUBLIC_API_URL + 'yume_summary', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(formattedQA),
+        });
+
+        res.json().then((data: { Analysis: string }) => {
+          setDreamAnalysis(data.Analysis);
+        }
+        );
+        setLoading(false);
+      } catch (error) {
+        console.error("Error fetching Yume data:", error);
+        return null;
+      }
+    }
+    DreamSummary();
+    
   };
 
   return (
@@ -113,16 +134,13 @@ export default function Questions() {
                   <div className="space-y-4">
                     {questions && questions.length > 0 ? (
                       questions.map((question, index) => (
-                        <div key={index} className="flex flex-col bg-purple-800 bg-opacity-20 border border-purple-400 border-opacity-20 p-4 rounded-lg">
-                          <p className="text-white mb-2">{question.Question}</p>
-                          <textarea
-                            className="w-full p-2 rounded-md bg-purple-900 bg-opacity-50 text-white border border-purple-300 focus:outline-none focus:ring-2 focus:ring-pink-400 placeholder-purple-300 placeholder-opacity-30 focus:border-transparent"
-                            value={answers[index] || ''}
-                            onChange={(e) => handleAnswerChange(index, e.target.value)}
-                            placeholder={question.Answer}
-                            rows={3}
-                          />
-                        </div>
+                        <AnswerText 
+                          key={index} 
+                          question={question} 
+                          index={index} 
+                          handleAnswerChange={handleAnswerChange}
+                        />
+
                       ))
                     ) : (
                       <p className="text-white">質問が読み込めませんでした。もう一度お試しください。</p>
