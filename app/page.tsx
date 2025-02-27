@@ -1,10 +1,12 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import Button from "./components/Button";
+
 
 export default function Home() {
-  const [dream, setDream] = useState('');
+  const [dream, setDream] = useState("");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
@@ -12,83 +14,83 @@ export default function Home() {
     e.preventDefault();
     console.log("handleSubmit");
     if (!dream.trim()) return;
-  try {
-    setLoading(true);
-    const res = await fetch('http://localhost:8000/api/yume_question', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body:JSON.stringify({ Prompt: dream }),
-    });
+    try {
+      setLoading(true);
+      const res = await fetch("http://localhost:8000/api/yume_question", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ Prompt: dream }),
+      });
 
-    console.log("Response status:", res.status);
+      console.log("Response status:", res.status);
 
-    if (res.ok) {
-      const data = await res.json();
-      console.log("API Response:", data);
-      
-      // ここでデータをセットせず、questionsページで取得するようにする
-      
-      // セッションストレージに夢を保存
-      sessionStorage.setItem('dream', dream);
+      if (res.ok) {
+        const data = await res.json();
+        console.log("API Response:", data);
 
-      if (data && data.Question) {
-        sessionStorage.setItem('questionData', JSON.stringify(data));
+        // ここでデータをセットせず、questionsページで取得するようにする
+
+        // セッションストレージに夢を保存
+        sessionStorage.setItem("dream", dream);
+
+        if (data && data.Question) {
+          sessionStorage.setItem("questionData", JSON.stringify(data));
+        }
+
+        router.push("/questions");
+      } else {
+        const errorData = await res.text();
+        console.error("API Error:", errorData);
+        alert("エラーが発生しました");
+        setLoading(false);
       }
-      
-      router.push('/questions');
-    } else {
-      const errorData = await res.text();
-      console.error("API Error:", errorData);
-      alert('エラーが発生しました');
+    } catch (error) {
+      console.error("Fetch Error:", error);
+      alert("通信エラーが発生しました");
       setLoading(false);
     }
-  } catch (error) {
-    console.error("Fetch Error:", error);
-    alert('通信エラーが発生しました');
-    setLoading(false);
-  }
-};
+  };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-purple-700 to-pink-600">
-      <main className="container mx-auto px-4 py-16">
-        <div className="max-w-2xl mx-auto">
-          <div className="text-center mb-12">
-            <h1 className="text-4xl font-bold mb-4 text-white">Dream Step</h1>
-            <p className="text-xl text-purple-100">AIと共に、夢への道筋を明確にしましょう</p>
-          </div>
+    <div className="min-h-screen bg-rose-400 flex items-center justify-center">
+      <div className="container mx-auto px-4 py-12 md:py-24">
+        <div className="flex flex-col md:flex-row items-center justify-between gap-12">
+          <div className="w-full md:w-1/2 space-y-8 text-white">
+            <h1 className="text-[80px] font-bold leading-tight">Dream Step</h1>
+            <p className="text-xl md:text-2xl font-medium">
+              AIと共に、
+              <br />
+              夢への道筋を明確に。
+            </p>
 
-          <div className="bg-white bg-opacity-10 backdrop-blur-lg rounded-xl p-8 shadow-2xl border border-purple-300 border-opacity-20">
-            <form onSubmit={handleSubmit}>
-              <div className="mb-8">
-                <label htmlFor="dream" className="block text-xl font-medium mb-4 text-white">
-                  あなたの夢を教えてください
-                </label>
+            <div className="space-y-4 max-w-md">
+              <form onSubmit={handleSubmit}>
                 <textarea
                   id="dream"
                   rows={5}
-                  className="w-full p-4 rounded-lg bg-purple-800 bg-opacity-30 text-white placeholder-purple-300 border border-purple-400 border-opacity-30 focus:ring-2 focus:ring-pink-500 focus:border-transparent"
-                  placeholder="例: 自分のカフェを開きたい、世界一周旅行をしたい..."
                   value={dream}
                   onChange={(e) => setDream(e.target.value)}
-                  required
+                  placeholder="あなたの夢を入力してください..."
+                  className="w-full px-4 py-3 rounded-lg border-2 border-white bg-transparent text-white placeholder-white focus:outline-none focus:ring-2 focus:ring-white"
                 />
-              </div>
+                <div className="my-10">
+                  <Button label="今すぐ試してみる" />
+                </div>
+              </form>
+            </div>
+          </div>
 
-
-              
-              <div className="flex justify-end">
-                <button
-                  type="submit"
-                  className="px-8 py-3 bg-gradient-to-r from-pink-500 to-purple-600 text-white font-medium rounded-full shadow-lg hover:from-pink-600 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-offset-2 transform transition hover:-translate-y-1"
-                >
-                  次へ進む
-                </button>
-              </div>
-            </form>
+          <div className="w-full md:w-1/2 flex justify-center">
+            <div className="relative">
+              <img
+                src="" // 画像URLをここに追加
+                alt="Laptop with code"
+                className="rounded-lg shadow-2xl max-w-full h-auto"
+              />
+            </div>
           </div>
         </div>
-      </main>
+      </div>
     </div>
   );
 }

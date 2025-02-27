@@ -1,4 +1,7 @@
 "use client";
+
+import Button from "../components/Button";
+
 import React, { FormEvent, useState } from "react";
 import { continueConversation } from "../actions";
 
@@ -33,27 +36,23 @@ const Chatbot = () => {
     <>
       <div className="px-4">
         <div className="py-8">
-          <label
-            htmlFor="question"
-            className="block font-medium leading-6 text-lg text-gray-900 pb-2"
-          >
-            質問：
-          </label>
+
           <div className="mt-2">
             <textarea
               id="question"
-              className="block w-full rounded-md border-0 py-1.5 px-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-              placeholder="質問を入力してください"
-              maxLength={500}
               rows={5}
               value={prompt}
               onChange={(e) => setPrompt(e.target.value)}
+              placeholder="質問を入力してください..."
+              className="w-full px-4 py-3 rounded-lg border-2 border-white bg-transparent text-white placeholder-white focus:outline-none focus:ring-2 focus:ring-white"
             />
           </div>
         </div>
-        <form className="flex justify-end mb-8" onSubmit={onSubmit}>
+        <div className="flex justify-end">
           <button
-            className="rounded-md bg-indigo-600 px-6 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+            className="px-8 py-4  bg-white text-rose-400 font-bold  rounded-full"
+            onClick={generateAnswer}
+
             disabled={prompt.length === 0}
             type="submit"
           >
@@ -62,10 +61,10 @@ const Chatbot = () => {
         </form>
         {answer && (
           <>
-            <div className="font-medium leading-6 text-lg text-gray-900 pb-2">
+            <div className="font-medium leading-6 text-lg text-white pb-2">
               回答：
             </div>
-            <p className="mt-2 text-gray-700">{answer}</p>
+            <p className="mt-2 text-white">{answer}</p>
           </>
         )}
       </div>

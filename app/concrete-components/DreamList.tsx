@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import DreamItem from "./DreamItem";
+
 import SakuraIcon from "./Sakura";
 import SakuraLoading from "../components/SakuraLoading";
 
@@ -75,13 +76,13 @@ export default function DreamList() {
   };
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen ml-20">
       <div className="py-12">
-        <h1 className="text-3xl font-bold text-center mb-8 text-gray-800 flex items-center justify-center relative z-10">
-          <span className="bg-clip-text text-transparent bg-gradient-to-r from-[#FC67B1] to-pink-400 mr-2">
-            夢の細分化タスク
+        <h1 className="text-3xl font-bold text-center mb-8 text-gray-800 flex items-center justify-center">
+          <span className="text-white mr-2 text-4xl tracking-[5px]">
+            - ゆめステップ -
+
           </span>
-          <SakuraIcon />
         </h1>
         {loading && (
           <SakuraLoading />
