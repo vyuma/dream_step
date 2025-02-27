@@ -5,16 +5,49 @@ import { useRouter } from 'next/navigation';
 
 export default function Home() {
   const [dream, setDream] = useState('');
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (dream.trim()) {
-      // App Routerではクエリパラメータの代わりにURLパスかSessionStorageを使う
+    console.log("handleSubmit");
+    if (!dream.trim()) return;
+  try {
+    setLoading(true);
+    const res = await fetch('http://localhost:8000/api/yume_question', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:JSON.stringify({ Prompt: dream }),
+    });
+
+    console.log("Response status:", res.status);
+
+    if (res.ok) {
+      const data = await res.json();
+      console.log("API Response:", data);
+      
+      // ここでデータをセットせず、questionsページで取得するようにする
+      
+      // セッションストレージに夢を保存
       sessionStorage.setItem('dream', dream);
+
+      if (data && data.Question) {
+        sessionStorage.setItem('questionData', JSON.stringify(data));
+      }
+      
       router.push('/questions');
+    } else {
+      const errorData = await res.text();
+      console.error("API Error:", errorData);
+      alert('エラーが発生しました');
+      setLoading(false);
     }
-  };
+  } catch (error) {
+    console.error("Fetch Error:", error);
+    alert('通信エラーが発生しました');
+    setLoading(false);
+  }
+};
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-900 via-purple-700 to-pink-600">

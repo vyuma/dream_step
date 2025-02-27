@@ -11,8 +11,6 @@ import os
 from yume_prompt_agent import YumeService
 
 
-workspace_path = Path("/workspaces/physiquest_animation_generator/backend/media/videos")
-
 class Input(BaseModel):
     input: str
 

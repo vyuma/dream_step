@@ -4,8 +4,8 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
 type Question = {
-  id: number;
-  text: string;
+  Question: string;
+  Anser: string;
 };
 
 type Answers = {
@@ -21,22 +21,43 @@ export default function Questions() {
   const [dreamAnalysis, setDreamAnalysis] = useState<string | null>(null);
 
   useEffect(() => {
-    const storedDream = sessionStorage.getItem('dream');
-    if (storedDream) {
-      setDream(storedDream);
-      setTimeout(() => {
-        const mockQuestions = [
-          { id: 1, text: "その夢をどのくらいの期間で実現したいですか？" },
-          { id: 2, text: "その夢を実現するためにすでに行動していることはありますか？" },
-          { id: 3, text: "その夢を持った理由や原点は何ですか？" },
-          { id: 4, text: "夢の実現に必要なスキルや資源は何だと思いますか？" },
-          { id: 5, text: "この夢に対して不安や障害に感じていることはありますか？" }
-        ];
-        setQuestions(mockQuestions);
+    if (typeof window !== 'undefined') {
+      const storedDream = sessionStorage.getItem('dream');
+      const storedQuestionData = sessionStorage.getItem('questionData');
+      
+      if (storedDream) {
+        setDream(storedDream);
+        
+        if (storedQuestionData) {
+          try {
+            const data = JSON.parse(storedQuestionData);
+            console.log("セッションストレージから読み込んだデータ:", data);
+            
+            if (data && data.Question && Array.isArray(data.Question)) {
+              setQuestions(data.Question);
+              
+              // 初期回答をLLMの回答に設定
+              const initialAnswers: {[key: number]: string} = {};
+              data.Question.forEach((q: any, index: number) => {
+                initialAnswers[index] = q.Anser || '';
+              });
+              setAnswers(initialAnswers);
+            } else {
+              console.error("予期しないデータ形式:", data);
+            }
+          } catch (e) {
+            console.error("JSONパースエラー:", e);
+          }
+        } else {
+          console.error("質問データがセッションストレージにありません");
+        }
+        
         setLoading(false);
-      }, 1500);
-    } else {
-      router.push('/');
+      } else {
+        // 夢のデータがない場合はホーム画面に戻る
+        console.log("夢データがセッションストレージにないため、ホーム画面に戻ります");
+        router.push('/');
+      }
     }
   }, [router]);
 
@@ -73,17 +94,22 @@ export default function Questions() {
                 <div className="mb-8">
                   <h2 className="text-xl font-medium text-white mb-4">以下の質問に回答してください：</h2>
                   <div className="space-y-4">
-                    {questions.map((question) => (
-                      <div key={question.id} className="flex flex-col bg-purple-800 bg-opacity-20 border border-purple-400 border-opacity-20 p-4 rounded-lg">
-                        <p className="text-white mb-2">{question.text}</p>
-                        <textarea
-                          className="w-full p-2 rounded-md bg-purple-900 bg-opacity-50 text-white border border-purple-300 focus:outline-none focus:ring-2 focus:ring-pink-400"
-                          value={answers[question.id] || ''}
-                          onChange={(e) => handleAnswerChange(question.id, e.target.value)}
-                          rows={3}
-                        />
-                      </div>
-                    ))}
+                    {questions && questions.length > 0 ? (
+                      questions.map((question, index) => (
+                        <div key={index} className="flex flex-col bg-purple-800 bg-opacity-20 border border-purple-400 border-opacity-20 p-4 rounded-lg">
+                          <p className="text-white mb-2">{question.Question}</p>
+                          <textarea
+                            className="w-full p-2 rounded-md bg-purple-900 bg-opacity-50 text-white border border-purple-300 focus:outline-none focus:ring-2 focus:ring-pink-400 placeholder-purple-300 placeholder-opacity-30 focus:border-transparent"
+                            value={answers[index] || ''}
+                            onChange={(e) => handleAnswerChange(index, e.target.value)}
+                            placeholder={question.Anser}
+                            rows={3}
+                          />
+                        </div>
+                      ))
+                    ) : (
+                      <p className="text-white">質問が読み込めませんでした。もう一度お試しください。</p>
+                    )}
                   </div>
                 </div>
 
@@ -91,6 +117,7 @@ export default function Questions() {
                   <button
                     onClick={handleSave}
                     className="px-8 py-3 bg-gradient-to-r from-pink-500 to-purple-600 text-white font-medium rounded-full shadow-lg hover:from-pink-600 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-offset-2 transform transition hover:-translate-y-1"
+                    disabled={questions.length === 0}
                   >
                     回答を生成する
                   </button>
