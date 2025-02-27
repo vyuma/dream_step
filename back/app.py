@@ -47,20 +47,20 @@ async def root():
     return {"message": "Hello World"}
 
 @app.get("/api/yume_question")
-def generate_yume_question(yume_prompt:str):
+async def generate_yume_question(yume_prompt:str):
     yume_question = yume_agent.generate_yume_question(yume_prompt)
     # json形式で返答する
     return responses.JSONResponse(content=yume_question,media_type="application/json")
 
 @app.post("/api/yume_summary")
-def generate_yume_summery(yume_answer:YumeAnswer):
+async def generate_yume_summery(yume_answer:YumeAnswer):
     yume_answer=yume_answer.model_dump()["Answer"]
     print(yume_answer)
     summary = yume_agent.generate_yume_summary_agent(yume_answer)
     return summary
 
 @app.get("/api/get_object_and_tasks")
-def generate_yume_object_and_tasks(yume_summary:str):
+async def generate_yume_object_and_tasks(yume_summary:str):
     object_and_tasks = yume_agent.generate_yume_object_and_task(yume_summary)
     return responses.JSONResponse(content=object_and_tasks,media_type="application/json")
 
