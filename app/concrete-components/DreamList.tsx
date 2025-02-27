@@ -4,6 +4,7 @@ import DreamItem from "./DreamItem";
 import SakuraIcon from "./Sakura";
 import SakuraLoading from "../components/SakuraLoading";
 
+
 type Task = {
   date: string;
   object: string;
@@ -13,13 +14,11 @@ type Task = {
 export default function DreamList() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [openStates, setOpenStates] = useState<boolean[]>([]); 
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
 
-  const fetchTasks = async (dreams:string) => {
-    
-  }
 // utils/fetchYumeData.ts
   const fetchDreamTasks = async (summary: string) => {
+    console.log("Fetching Yume data for:", summary);
     try {
       const response = await fetch(process.env.NEXT_PUBLIC_API_URL +"api/get_object_and_tasks", {
         method: "POST",
@@ -54,17 +53,18 @@ export default function DreamList() {
     }
   };
 
+    // 仮の夢のサマリーを設定する。
+    
+    useEffect(()=>{
+      const dreamSummary = "フルスタックエンジニアになりたいです";
+      const Dream_plan = async () => {
+        await fetchDreamTasks(dreamSummary);
+        setLoading(false);
+      }
+      Dream_plan();
+      
+    },[])
 
-  useEffect(() => {
-    // ここは
-    const dreamSummary = "フルスタックエンジニアになりたいです";
-    if (!dreamSummary) {
-      return alert("夢がありません");
-    }
-    setLoading(true);
-    const yume_task= fetchDreamTasks(dreamSummary);
-    setLoading(false);
-  }, []);
 
   const handleToggle = (index: number) => {
     setOpenStates((prev) => {
@@ -77,7 +77,7 @@ export default function DreamList() {
   return (
     <div className="min-h-screen">
       <div className="py-12">
-        <h1 className="text-3xl font-bold text-center mb-8 text-gray-800 flex items-center justify-center">
+        <h1 className="text-3xl font-bold text-center mb-8 text-gray-800 flex items-center justify-center relative z-10">
           <span className="bg-clip-text text-transparent bg-gradient-to-r from-[#FC67B1] to-pink-400 mr-2">
             夢の細分化タスク
           </span>
@@ -100,4 +100,5 @@ export default function DreamList() {
       </div>
     </div>
   );
+// return <div>hello</div>;
 }

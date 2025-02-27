@@ -3,10 +3,10 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
-type Question = {
-  Question: string;
-  Anser: string;
-};
+import  AnswerText from '../components/AnswerText';
+import {Question} from  '../components/AnswerText'
+
+
 
 type Answers = {
   [key: number]: string;
@@ -66,8 +66,42 @@ export default function Questions() {
   };
 
   const handleSave = () => {
+    // 回答をanswerから取得して、{Question:質問, Answer:回答}の形式に変換
+    const formattedQA = {
+      "Answer": questions.map((q,index)=> {
+        return {
+          "Question": q.Question,
+          "Answer": answers[index]
+        }
+      })
+    }
+
+
     sessionStorage.setItem('answers', JSON.stringify(answers));
-    setDreamAnalysis("あなたの夢について具体的な計画を立てるための情報が集まりました。短期的な目標と長期的な目標を段階的に設定し、必要なスキルを習得しながら、着実に前進することが重要です。まずは情報収集と小さな一歩から始めましょう。あなたの熱意と具体的な行動計画があれば、この夢は実現可能です。");
+
+    // APIに回答する。
+    const DreamSummary = async () => {
+      setLoading(true);
+      try {
+        const res = await fetch(process.env.NEXT_PUBLIC_API_URL + 'yume_summary', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(formattedQA),
+        });
+
+        res.json().then((data: { Analysis: string }) => {
+          setDreamAnalysis(data.Analysis);
+        }
+        );
+        setLoading(false);
+      } catch (error) {
+        console.error("Error fetching Yume data:", error);
+        return null;
+      }
+    }
+    DreamSummary();
+    
+
   };
 
   return (
@@ -96,16 +130,12 @@ export default function Questions() {
                   <div className="space-y-4">
                     {questions && questions.length > 0 ? (
                       questions.map((question, index) => (
-                        <div key={index} className="flex flex-col bg-purple-800 bg-opacity-20 border border-purple-400 border-opacity-20 p-4 rounded-lg">
-                          <p className="text-white mb-2">{question.Question}</p>
-                          <textarea
-                            className="w-full p-2 rounded-md bg-purple-900 bg-opacity-50 text-white border border-purple-300 focus:outline-none focus:ring-2 focus:ring-pink-400 placeholder-purple-300 placeholder-opacity-30 focus:border-transparent"
-                            value={answers[index] || ''}
-                            onChange={(e) => handleAnswerChange(index, e.target.value)}
-                            placeholder={question.Anser}
-                            rows={3}
-                          />
-                        </div>
+                        <AnswerText 
+                          key={index} 
+                          question={question} 
+                          index={index} 
+                          handleAnswerChange={handleAnswerChange}
+                        />
                       ))
                     ) : (
                       <p className="text-white">質問が読み込めませんでした。もう一度お試しください。</p>
@@ -119,7 +149,7 @@ export default function Questions() {
                     className="px-8 py-3 bg-gradient-to-r from-pink-500 to-purple-600 text-white font-medium rounded-full shadow-lg hover:from-pink-600 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-offset-2 transform transition hover:-translate-y-1"
                     disabled={questions.length === 0}
                   >
-                    回答を生成する
+                    あなたの夢を明確に
                   </button>
                 </div>
 

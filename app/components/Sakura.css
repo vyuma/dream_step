@@ -3,9 +3,11 @@ sakura_block
 -----------------------------------*/
 #sakura_block {
     width: 100%;
-    position: relative;
+    position: absolute;
     overflow: hidden;
     height: 100vh; /* 画面いっぱいにする */
+    top: 0;
+    left: 0;
     /* グラデーションを追加する */
     background: oklch(0.971 0.013 17.38); 
 
@@ -74,40 +76,55 @@ sakura_block
 .sakura_parts_box img:nth-child(1) {
     animation-duration: 6s;
     animation-delay: 0s;
+    left: 10%;
 }
 .sakura_parts_box img:nth-child(2) {
     animation-duration: 7s;
     animation-delay: 1s;
+    left: 20%;
 }
 .sakura_parts_box img:nth-child(3) {
     animation-duration: 8s;
     animation-delay: 2s;
+    left: 30%;
 }
 .sakura_parts_box img:nth-child(4) {
     animation-duration: 9s;
     animation-delay: 3s;
+    left: 40%;
 }
 .sakura_parts_box img:nth-child(5) {
     animation-duration: 6.5s;
     animation-delay: 1.5s;
+    left: 50%;
 }
 .sakura_parts_box img:nth-child(6) {
     animation-duration: 7.5s;
     animation-delay: 2.5s;
+    left: 60%;
 }
 .sakura_parts_box img:nth-child(7) {
     animation-duration: 8.5s;
     animation-delay: 3.5s;
+    left: 70%;
 }
 .sakura_parts_box img:nth-child(8) {
     animation-duration: 9.5s;
     animation-delay: 4.5s;
+    left: 80%;
 }
 .sakura_parts_box img:nth-child(9) {
     animation-duration: 6.3s;
     animation-delay: 0.8s;
+    left: 90%;
 }
 .sakura_parts_box img:nth-child(10) {
     animation-duration: 7.8s;
     animation-delay: 1.3s;
+    left: 50%;
+}
+.sakura_parts_box img:nth-child(11) {
+    animation-duration: 7.8s;
+    animation-delay: 1.3s;
+    left: 11%;
 }
