@@ -23,14 +23,14 @@ const DreamItem: React.FC<{
   };
 
   return (
-    <li className="border border-pink-200 p-6 my-4 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 bg-white/80 backdrop-blur-sm">
+    <li className="border border-pink-200 p-6 my-4 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 bg-white backdrop-blur-sm">
       {/* ヘッダー部分（クリックで開閉） */}
       <div
         className="flex justify-between items-center cursor-pointer"
         onClick={onToggle}
       >
         <div>
-          <h2 className="text-lg font-semibold text-[#FC67B1]">{task.date}</h2>
+          <h2 className="text-lg font-semibold text-rose-400">{task.date}</h2>
           <p className="text-gray-700 font-medium text-lg">{task.object}</p>
         </div>
         <span className="text-xl text-gray-500">{isOpen ? "▲" : "▼"}</span>

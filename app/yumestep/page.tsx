@@ -4,7 +4,7 @@ import DreamSummary from "../concrete-components/Chatbot";
 
 export default function Page() {
   return (
-    <div style={{ display: "flex", width: "100%" }}>
+    <div className="bg-rose-400" style={{ display: "flex", width: "100%" }}>
       <div style={{ flex: 6 }}>
         <DreamList />
       </div>
