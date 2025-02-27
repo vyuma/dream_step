@@ -63,6 +63,7 @@ class YumeService():
         chain = prompt_template | self.flash_llm_pro| parser
         result = chain.invoke({"yume_prompt": yume_prompt})
         return result
+    
     def generate_yume_summary_agent(self,yume_answer:list[str]):
         yume_answer = "\n".join([f"Q: {item['Question']}\nA: {item['Answer']}" for item in yume_answer])
         yume_summary_system_prompt = ChatPromptTemplate.from_template(
