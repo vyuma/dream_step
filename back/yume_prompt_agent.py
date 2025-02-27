@@ -88,8 +88,8 @@ class YumeService():
         # yume_stepの構造体の設定
         yume_step_response_schemas = [
             ResponseSchema(
-                name="Tasks",
-                description="配列形式の項目リスト。例: [{Objects: string,Task: string[]}]",
+                name="tasks",
+                description="配列形式の項目リスト。例: [{Date:string ,Objects: string,Task: string[]}]",
                 type="array(objects)"
             )
         ]
@@ -129,16 +129,15 @@ class YumeService():
             """,
         )
         
-        object_chain = yume_object_system_prompt | self.flash_exp | object_parser | RunnablePassthrough().assign(yume_object=lambda x: x)
-        yume_task_chain = yume_task_system_prompt | self.flash_llm_pro | yume_step_parser | RunnablePassthrough().assign(yume_task=lambda x: x)
+        object_chain = yume_object_system_prompt | self.flash_exp | object_parser 
+        yume_object = object_chain.invoke({"yume_summary": yume_summary})
         
-        chain = RunnableSequence(
-            object_chain,
-            yume_task_chain
-        )
+        yume_task_chain = yume_task_system_prompt | self.flash_llm_pro | yume_step_parser 
+        yume_task = yume_task_chain.invoke({"yume_object": yume_object})
         
-        output = chain.invoke({"yume_summary": yume_summary})
-        return output
+        return yume_task
+
+    
     
     
     

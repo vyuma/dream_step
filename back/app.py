@@ -59,6 +59,10 @@ def generate_yume_summery(yume_answer:YumeAnswer):
     summary = yume_agent.generate_yume_summary_agent(yume_answer)
     return summary
 
+@app.get("/api/get_object_and_tasks")
+def generate_yume_object_and_tasks(yume_summary:str):
+    object_and_tasks = yume_agent.generate_yume_object_and_task(yume_summary)
+    return responses.JSONResponse(content=object_and_tasks,media_type="application/json")
 
 
 
