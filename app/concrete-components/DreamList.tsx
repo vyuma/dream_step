@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import DreamItem from "./DreamItem";
 import SakuraIcon from "./Sakura";
+import SakuraLoading from "../components/SakuraLoading";
 
 type Task = {
   date: string;
@@ -12,28 +13,57 @@ type Task = {
 export default function DreamList() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [openStates, setOpenStates] = useState<boolean[]>([]); 
+  const [loading, setLoading] = useState(false);
 
   const fetchTasks = async (dreams:string) => {
     
   }
+// utils/fetchYumeData.ts
+  const fetchDreamTasks = async (summary: string) => {
+    try {
+      const response = await fetch(process.env.NEXT_PUBLIC_API_URL +"api/get_object_and_tasks", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+            "Summary": summary
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
+      response.json().then((data: {
+        tasks: { Date: string; Object: string; Task: string[] }[];
+      }) => {
+        const formattedTasks: Task[] = data.tasks.map((task) => ({
+          date: task.Date,
+          object: task.Object,
+          task: task.Task,
+        }));
+        setTasks(formattedTasks);
+        setOpenStates(formattedTasks.map((_, i) => i === 0)); // index: 0だけ開く
+      });
+      return response;
+
+    } catch (error) {
+      console.error("Error fetching Yume data:", error);
+      return null;
+    }
+  };
 
 
   useEffect(() => {
-    fetch("/tasks.json")
-      .then((res) => res.json())
-      .then(
-        (data: {
-          tasks: { Date: string; Object: string; Task: string[] }[];
-        }) => {
-          const formattedTasks: Task[] = data.tasks.map((task) => ({
-            date: task.Date,
-            object: task.Object,
-            task: task.Task,
-          }));
-          setTasks(formattedTasks);
-          setOpenStates(formattedTasks.map((_, i) => i === 0)); // index: 0だけ開く
-        }
-      );
+    // ここは
+    const dreamSummary = "フルスタックエンジニアになりたいです";
+    if (!dreamSummary) {
+      return alert("夢がありません");
+    }
+    setLoading(true);
+    const yume_task= fetchDreamTasks(dreamSummary);
+    setLoading(false);
   }, []);
 
   const handleToggle = (index: number) => {
@@ -53,6 +83,10 @@ export default function DreamList() {
           </span>
           <SakuraIcon />
         </h1>
+        {loading && (
+          <SakuraLoading />
+        )}
+
         <ul className="space-y-6">
           {tasks.map((task, index) => (
             <DreamItem
