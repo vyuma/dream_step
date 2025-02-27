@@ -1,20 +1,33 @@
 "use client";
-import React, { useState } from "react";
+import React, { FormEvent, useState } from "react";
+import { continueConversation } from "../actions";
 
 const Chatbot = () => {
   const [prompt, setPrompt] = useState<string>("");
-  const [answer, setAnswer] = useState<string | null>(null);
+  const [answer, setAnswer] = useState<string>("");
 
-  //仮のresponse
-  const responses: { [key: string]: string } = {
-    こんにちは: "こんにちは！どうぞご質問ください。",
-  };
+  const onSubmit = async (event: FormEvent) => {
+    event.preventDefault();
 
-  const generateAnswer = () => {
-    setAnswer(
-      responses[prompt] || "すみません、その質問にはまだ対応していません。"
-    );
-  };
+    const response = await fetch('/api/ai', {
+      method: "POST",
+      body: JSON.stringify({prompt})
+    });
+    const reader = response.body?.pipeThrough(new TextDecoderStream()).getReader();
+
+    if (reader === undefined) {
+      return;
+    }
+    
+    while(true) {
+      const readResponse = await reader.read();
+      if (readResponse.done) {
+        break;
+      }
+
+      setAnswer((prev) => prev + readResponse.value)
+    }
+  }
 
   return (
     <>
@@ -38,15 +51,15 @@ const Chatbot = () => {
             />
           </div>
         </div>
-        <div className="flex justify-end mb-8">
+        <form className="flex justify-end mb-8" onSubmit={onSubmit}>
           <button
             className="rounded-md bg-indigo-600 px-6 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-            onClick={generateAnswer}
             disabled={prompt.length === 0}
+            type="submit"
           >
             質問する
           </button>
-        </div>
+        </form>
         {answer && (
           <>
             <div className="font-medium leading-6 text-lg text-gray-900 pb-2">

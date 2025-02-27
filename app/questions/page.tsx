@@ -7,6 +7,10 @@ import  AnswerText from '../components/AnswerText';
 import {Question} from  '../components/AnswerText'
 
 
+type Question = {
+  Question: string;
+  Answer: string;
+};
 
 type Answers = {
   [key: number]: string;
@@ -18,6 +22,7 @@ export default function Questions() {
   const [questions, setQuestions] = useState<Question[]>([]);
   const [answers, setAnswers] = useState<Answers>({});
   const [loading, setLoading] = useState(true);
+  const [processingNext, setProcessingNext] = useState(false);
   const [dreamAnalysis, setDreamAnalysis] = useState<string | null>(null);
 
   useEffect(() => {
@@ -101,7 +106,6 @@ export default function Questions() {
     }
     DreamSummary();
     
-
   };
 
   return (
@@ -136,6 +140,7 @@ export default function Questions() {
                           index={index} 
                           handleAnswerChange={handleAnswerChange}
                         />
+
                       ))
                     ) : (
                       <p className="text-white">質問が読み込めませんでした。もう一度お試しください。</p>
@@ -147,11 +152,27 @@ export default function Questions() {
                   <button
                     onClick={handleSave}
                     className="px-8 py-3 bg-gradient-to-r from-pink-500 to-purple-600 text-white font-medium rounded-full shadow-lg hover:from-pink-600 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-offset-2 transform transition hover:-translate-y-1"
-                    disabled={questions.length === 0}
+                    disabled={questions.length === 0 || processingNext}
                   >
-                    あなたの夢を明確に
+                    {processingNext ? (
+                      <div className="flex items-center">
+                        <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white mr-2"></div>
+                        処理中...
+                      </div>
+                    ) : (
+                      "次へ進む"
+                    )}
                   </button>
                 </div>
+
+                {processingNext && !dreamAnalysis && (
+                <div className="mt-8 flex justify-center items-center py-8">
+                  <div className="flex flex-col items-center">
+                    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-pink-500 mb-4"></div>
+                    <p className="text-white">夢の分析を生成しています...</p>
+                  </div>
+                </div>
+              )}
 
                 {dreamAnalysis && (
                   <div className="mt-8 p-6 bg-purple-800 bg-opacity-20 rounded-lg border border-purple-400 border-opacity-20 relative">
