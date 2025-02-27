@@ -4,48 +4,86 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
 type Question = {
-  id: number;
-  text: string;
-};
-
-type Answers = {
-  [key: number]: string;
+  Question: string;
+  Anser: string; // APIのレスポンスに合わせて"Anser"というスペルにする
 };
 
 export default function Questions() {
   const router = useRouter();
   const [dream, setDream] = useState<string>('');
   const [questions, setQuestions] = useState<Question[]>([]);
-  const [answers, setAnswers] = useState<Answers>({});
+  const [answers, setAnswers] = useState<{[key: number]: string}>({});
   const [loading, setLoading] = useState(true);
   const [dreamAnalysis, setDreamAnalysis] = useState<string | null>(null);
 
   useEffect(() => {
-    const storedDream = sessionStorage.getItem('dream');
-    if (storedDream) {
-      setDream(storedDream);
-      setTimeout(() => {
-        const mockQuestions = [
-          { id: 1, text: "その夢をどのくらいの期間で実現したいですか？" },
-          { id: 2, text: "その夢を実現するためにすでに行動していることはありますか？" },
-          { id: 3, text: "その夢を持った理由や原点は何ですか？" },
-          { id: 4, text: "夢の実現に必要なスキルや資源は何だと思いますか？" },
-          { id: 5, text: "この夢に対して不安や障害に感じていることはありますか？" }
-        ];
-        setQuestions(mockQuestions);
-        setLoading(false);
-      }, 1500);
-    } else {
-      router.push('/');
+    if (typeof window !== 'undefined') {
+      const storedDream = sessionStorage.getItem('yume_prompt');
+      if (storedDream) {
+        setDream(storedDream);
+        
+        // サーバーに質問を取得するリクエストを送信
+        const requestBody = { yume_prompt: storedDream };
+        console.log("送信リクエスト:", requestBody);
+        
+        fetch("http://localhost:8000/api/generate_yume_question", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(requestBody)
+        })
+          .then(async (res) => {
+            console.log("レスポンスステータス:", res.status);
+            const responseText = await res.text(); // テキストとして読み込み
+            console.log("レスポンス本文:", responseText);
+            
+            try {
+              // 有効なJSONかどうか確認してからパース
+              const data = responseText ? JSON.parse(responseText) : {};
+              if (!res.ok) {
+                console.error("APIエラー詳細:", data);
+                throw new Error(`API error: ${res.status}`);
+              }
+              return data;
+            } catch (e) {
+              console.error("JSONパースエラー:", e);
+              throw new Error("Invalid JSON response");
+            }
+          })
+          .then((data) => {
+            // バックエンドから返されるデータ構造に合わせる
+            if (data.Question && Array.isArray(data.Question)) {
+              setQuestions(data.Question);
+              
+              // 初期回答をLLMの回答に設定
+              const initialAnswers: {[key: number]: string} = {};
+              data.Question.forEach((q, index) => {
+                initialAnswers[index] = q.Anser;
+              });
+              setAnswers(initialAnswers);
+            } else {
+              console.error("Unexpected data format:", data);
+            }
+            setLoading(false);
+          })
+          .catch((error) => {
+            console.error("Error fetching questions:", error);
+            setLoading(false);
+          });
+      } else {
+        router.push('/');
+      }
     }
   }, [router]);
 
-  const handleAnswerChange = (id: number, value: string) => {
-    setAnswers(prev => ({ ...prev, [id]: value }));
+  const handleAnswerChange = (index: number, value: string) => {
+    setAnswers(prev => ({ ...prev, [index]: value }));
   };
 
   const handleSave = () => {
+    // 回答をセッションストレージに保存
     sessionStorage.setItem('answers', JSON.stringify(answers));
+    
+    // 夢の分析文を設定（実際にはAPIから取得するべき）
     setDreamAnalysis("あなたの夢について具体的な計画を立てるための情報が集まりました。短期的な目標と長期的な目標を段階的に設定し、必要なスキルを習得しながら、着実に前進することが重要です。まずは情報収集と小さな一歩から始めましょう。あなたの熱意と具体的な行動計画があれば、この夢は実現可能です。");
   };
 
@@ -73,17 +111,21 @@ export default function Questions() {
                 <div className="mb-8">
                   <h2 className="text-xl font-medium text-white mb-4">以下の質問に回答してください：</h2>
                   <div className="space-y-4">
-                    {questions.map((question) => (
-                      <div key={question.id} className="flex flex-col bg-purple-800 bg-opacity-20 border border-purple-400 border-opacity-20 p-4 rounded-lg">
-                        <p className="text-white mb-2">{question.text}</p>
-                        <textarea
-                          className="w-full p-2 rounded-md bg-purple-900 bg-opacity-50 text-white border border-purple-300 focus:outline-none focus:ring-2 focus:ring-pink-400"
-                          value={answers[question.id] || ''}
-                          onChange={(e) => handleAnswerChange(question.id, e.target.value)}
-                          rows={3}
-                        />
-                      </div>
-                    ))}
+                    {questions && questions.length > 0 ? (
+                      questions.map((question, index) => (
+                        <div key={index} className="flex flex-col bg-purple-800 bg-opacity-20 border border-purple-400 border-opacity-20 p-4 rounded-lg">
+                          <p className="text-white mb-2">{question.Question}</p>
+                          <textarea
+                            className="w-full p-2 rounded-md bg-purple-900 bg-opacity-50 text-white border border-purple-300 focus:outline-none focus:ring-2 focus:ring-pink-400"
+                            value={answers[index] || question.Anser}
+                            onChange={(e) => handleAnswerChange(index, e.target.value)}
+                            rows={3}
+                          />
+                        </div>
+                      ))
+                    ) : (
+                      <p className="text-white">質問が読み込めませんでした。もう一度お試しください。</p>
+                    )}
                   </div>
                 </div>
 

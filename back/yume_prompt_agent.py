@@ -12,7 +12,7 @@ from langchain.prompts import ChatPromptTemplate
 
 
 
-load_dotenv('/workspaces/dream_step/back/.env.loval')
+load_dotenv('/workspaces/dream_step/back/.env.local')
 
 class YumeService():
     def __init__(self):
@@ -24,6 +24,7 @@ class YumeService():
     def _load_llm(self, model_type: str):
         # if os.getenv('OPENAI_API_KEY'):
         #     return ChatOpenAI(model='gpt-4o-mini', temperature=0)
+        print(os.getenv("GOOGLE_API_KEY"))
         return ChatGoogleGenerativeAI(model=model_type, temperature=0.5,api_key=os.getenv('GOOGLE_API_KEY'))
 
     

@@ -10,3 +10,4 @@ langchain_openai
 langchain-google-genai
 langdetect
 deepl
+dotenv
