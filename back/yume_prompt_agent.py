@@ -15,7 +15,7 @@ from langchain.schema.runnable import RunnablePassthrough
 
 
 
-load_dotenv('/workspaces/dream_step/back/.env.loval')
+load_dotenv('/workspaces/dream_step/back/.env.local')
 
 class YumeService():
     def __init__(self):

@@ -13,6 +13,11 @@ export default function DreamList() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [openStates, setOpenStates] = useState<boolean[]>([]); 
 
+  const fetchTasks = async (dreams:string) => {
+    
+  }
+
+
   useEffect(() => {
     fetch("/tasks.json")
       .then((res) => res.json())
