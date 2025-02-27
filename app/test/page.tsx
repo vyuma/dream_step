@@ -1,5 +1,5 @@
+import DreamList from "../concrete-components/DreamList";
 
-
-export default function Home() {
-    
+export default function Page() {
+  return <DreamList />;
 }
