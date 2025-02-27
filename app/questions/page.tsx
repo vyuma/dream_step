@@ -83,7 +83,7 @@ export default function Questions() {
     const DreamSummary = async () => {
       setLoading(true);
       try {
-        const res = await fetch(process.env.NEXT_PUBLIC_API_URL + 'yume_summary', {
+        const res = await fetch(process.env.NEXT_PUBLIC_API_URL + 'api/yume_summary', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(formattedQA),
