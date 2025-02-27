@@ -16,10 +16,19 @@ export default function DreamList() {
   useEffect(() => {
     fetch("/tasks.json")
       .then((res) => res.json())
-      .then((data: { tasks: Task[] }) => {
-        setTasks(data.tasks);
-        setOpenStates(data.tasks.map((_, i) => i === 0)); // index: 0だけ開く 
-      });
+      .then(
+        (data: {
+          tasks: { Date: string; Object: string; Task: string[] }[];
+        }) => {
+          const formattedTasks: Task[] = data.tasks.map((task) => ({
+            date: task.Date,
+            object: task.Object,
+            task: task.Task,
+          }));
+          setTasks(formattedTasks);
+          setOpenStates(formattedTasks.map((_, i) => i === 0)); // index: 0だけ開く
+        }
+      );
   }, []);
 
   const handleToggle = (index: number) => {
