@@ -7,11 +7,6 @@ import  AnswerText from '../components/AnswerText';
 import {Question} from  '../components/AnswerText'
 
 
-type Question = {
-  Question: string;
-  Answer: string;
-};
-
 type Answers = {
   [key: number]: string;
 };
