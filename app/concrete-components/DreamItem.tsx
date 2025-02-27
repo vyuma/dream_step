@@ -1,4 +1,5 @@
 import { useState } from "react";
+import CheckBox from "./CheckBox";
 
 type Task = {
   date: string;
@@ -44,11 +45,10 @@ const DreamItem: React.FC<{
         <ul className="space-y-2">
           {task.task.map((t, i) => (
             <li key={i} className="flex items-start space-x-2 text-gray-600">
-              <input
-                type="checkbox"
+              <CheckBox
                 checked={completedTasks[i]}
                 onChange={() => handleCheckboxChange(i)}
-                className="w-5 h-5"
+                label={t}
               />
               <span>{t}</span>
             </li>
