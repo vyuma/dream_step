@@ -53,7 +53,7 @@ class YumeService():
             彼ら彼女らの夢はかなり抽象的であるので具体的に質問をしてより具体的な目標や夢に変換するための質問をしてください。
             また想定回答も送ってください。
             質問:{yume_prompt}
-            回答は以下のフォーマットを参照してください。
+            回答は以下のフォーマットを参照してください。質問が具体的であれば、3から5個で、抽象的であればそれ以上生成してください。
             {format_instructions}
             """,
             partial_variables={"format_instructions": parser.get_format_instructions()},
