@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 
 type Question = {
   Question: string;
-  Anser: string;
+  Answer: string;
 };
 
 type Answers = {
@@ -18,6 +18,7 @@ export default function Questions() {
   const [questions, setQuestions] = useState<Question[]>([]);
   const [answers, setAnswers] = useState<Answers>({});
   const [loading, setLoading] = useState(true);
+  const [processingNext, setProcessingNext] = useState(false);
   const [dreamAnalysis, setDreamAnalysis] = useState<string | null>(null);
 
   useEffect(() => {
@@ -65,9 +66,25 @@ export default function Questions() {
     setAnswers(prev => ({ ...prev, [id]: value }));
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
+    // 次へ進むボタンが押されたらローディング状態に
+    setProcessingNext(true);
+    
+    // 保存処理
     sessionStorage.setItem('answers', JSON.stringify(answers));
-    setDreamAnalysis("あなたの夢について具体的な計画を立てるための情報が集まりました。短期的な目標と長期的な目標を段階的に設定し、必要なスキルを習得しながら、着実に前進することが重要です。まずは情報収集と小さな一歩から始めましょう。あなたの熱意と具体的な行動計画があれば、この夢は実現可能です。");
+    
+    try {
+      // 時間がかかる処理をシミュレート
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      // 分析結果を設定
+      setDreamAnalysis("あなたの夢について具体的な計画を立てるための情報が集まりました...");
+    } catch (error) {
+      console.error("分析生成エラー:", error);
+    } finally {
+      // 処理完了後にローディング状態を解除
+      setProcessingNext(false);
+    }
   };
 
   return (
@@ -102,7 +119,7 @@ export default function Questions() {
                             className="w-full p-2 rounded-md bg-purple-900 bg-opacity-50 text-white border border-purple-300 focus:outline-none focus:ring-2 focus:ring-pink-400 placeholder-purple-300 placeholder-opacity-30 focus:border-transparent"
                             value={answers[index] || ''}
                             onChange={(e) => handleAnswerChange(index, e.target.value)}
-                            placeholder={question.Anser}
+                            placeholder={question.Answer}
                             rows={3}
                           />
                         </div>
@@ -117,11 +134,27 @@ export default function Questions() {
                   <button
                     onClick={handleSave}
                     className="px-8 py-3 bg-gradient-to-r from-pink-500 to-purple-600 text-white font-medium rounded-full shadow-lg hover:from-pink-600 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-offset-2 transform transition hover:-translate-y-1"
-                    disabled={questions.length === 0}
+                    disabled={questions.length === 0 || processingNext}
                   >
-                    回答を生成する
+                    {processingNext ? (
+                      <div className="flex items-center">
+                        <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white mr-2"></div>
+                        処理中...
+                      </div>
+                    ) : (
+                      "次へ進む"
+                    )}
                   </button>
                 </div>
+
+                {processingNext && !dreamAnalysis && (
+                <div className="mt-8 flex justify-center items-center py-8">
+                  <div className="flex flex-col items-center">
+                    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-pink-500 mb-4"></div>
+                    <p className="text-white">夢の分析を生成しています...</p>
+                  </div>
+                </div>
+              )}
 
                 {dreamAnalysis && (
                   <div className="mt-8 p-6 bg-purple-800 bg-opacity-20 rounded-lg border border-purple-400 border-opacity-20 relative">
