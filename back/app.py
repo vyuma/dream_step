@@ -27,6 +27,9 @@ class YumeAnswer(BaseModel):
 class YumePrompt(BaseModel):
     Prompt : str
 
+class YumeSummary(BaseModel):
+    Summary : str
+
 
 app = FastAPI(title='LangChain Server', version='1.0')
 
@@ -61,9 +64,9 @@ async def generate_yume_summery(yume_answer:YumeAnswer):
     summary = yume_agent.generate_yume_summary_agent(yume_answer)
     return summary
 
-@app.get("/api/get_object_and_tasks")
-async def generate_yume_object_and_tasks(yume_summary:str):
-    object_and_tasks = yume_agent.generate_yume_object_and_task(yume_summary)
+@app.post("/api/get_object_and_tasks")
+async def generate_yume_object_and_tasks(yume_summary:YumeSummary):
+    object_and_tasks = yume_agent.generate_yume_object_and_task(yume_summary.Summary)
     return responses.JSONResponse(content=object_and_tasks,media_type="application/json")
 
 

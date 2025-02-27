@@ -1,21 +1,36 @@
 "use client";
-import React, { useState } from "react";
+
 import Button from "../components/Button";
+
+import React, { FormEvent, useState } from "react";
+import { continueConversation } from "../actions";
 
 const Chatbot = () => {
   const [prompt, setPrompt] = useState<string>("");
-  const [answer, setAnswer] = useState<string | null>(null);
+  const [answer, setAnswer] = useState<string>("");
 
-  //仮のresponse
-  const responses: { [key: string]: string } = {
-    こんにちは: "こんにちは！どうぞご質問ください。",
-  };
+  const onSubmit = async (event: FormEvent) => {
+    event.preventDefault();
 
-  const generateAnswer = () => {
-    setAnswer(
-      responses[prompt] || "すみません、その質問にはまだ対応していません。"
-    );
-  };
+    const response = await fetch('/api/ai', {
+      method: "POST",
+      body: JSON.stringify({prompt})
+    });
+    const reader = response.body?.pipeThrough(new TextDecoderStream()).getReader();
+
+    if (reader === undefined) {
+      return;
+    }
+    
+    while(true) {
+      const readResponse = await reader.read();
+      if (readResponse.done) {
+        break;
+      }
+
+      setAnswer((prev) => prev + readResponse.value)
+    }
+  }
 
   return (
     <>
@@ -37,11 +52,13 @@ const Chatbot = () => {
           <button
             className="px-8 py-4  bg-white text-rose-400 font-bold  rounded-full"
             onClick={generateAnswer}
+
             disabled={prompt.length === 0}
+            type="submit"
           >
             質問する
           </button>
-        </div>
+        </form>
         {answer && (
           <>
             <div className="font-medium leading-6 text-lg text-white pb-2">

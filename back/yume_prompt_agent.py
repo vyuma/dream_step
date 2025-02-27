@@ -77,6 +77,7 @@ class YumeService():
         return yume_summary
     
     def generate_yume_object_and_task(self,yume_summary:str):
+        print('yume_summary:',yume_summary)
         # 構造体の設定
         object_response_schemas = [
         ResponseSchema(
@@ -131,10 +132,9 @@ class YumeService():
         
         object_chain = yume_object_system_prompt | self.flash_exp | object_parser 
         yume_object = object_chain.invoke({"yume_summary": yume_summary})
-        
+        print('yume_object:',yume_object)
         yume_task_chain = yume_task_system_prompt | self.flash_llm_pro | yume_step_parser 
         yume_task = yume_task_chain.invoke({"yume_object": yume_object})
-        
         return yume_task
 
     
