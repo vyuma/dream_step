@@ -73,7 +73,10 @@ export default function Home() {
                   className="w-full px-4 py-3 rounded-lg border-2 border-white bg-transparent text-white placeholder-white focus:outline-none focus:ring-2 focus:ring-white"
                 />
                 <div className="my-10">
-                  <Button label="今すぐ試してみる" />
+                  <Button 
+                    label={loading ? "処理中..." : "今すぐ試してみる"} 
+                    isLoading={loading} 
+                  />
                 </div>
               </form>
             </div>
@@ -81,7 +84,7 @@ export default function Home() {
           <div className="w-full md:w-1/2 flex justify-center">
             <div className="relative">
               <img
-                src="" // 画像URLをここに追加
+                src="http:" // 画像URLをここに追加
                 alt="Laptop with code"
                 className="rounded-lg shadow-2xl max-w-full h-auto"
               />

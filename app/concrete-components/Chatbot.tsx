@@ -79,9 +79,9 @@ const Chatbot = () => {
         <div className="font-medium leading-6 text-lg text-gray-900 pb-2">
           回答：
         </div>
-        <div className="w-full rounded-md p-4 min-h-32 border border-gray-200 bg-gray-50 whitespace-pre-wrap text-gray-700 overflow-y-auto">
+        <pre className="w-full rounded-md p-4 min-h-32 border border-gray-200 bg-gray-50 whitespace-pre-wrap text-gray-700 overflow-y-auto">
           {answer || "回答がここに表示されます"}
-        </div>
+        </pre>
       </div>
     </div>
   );
