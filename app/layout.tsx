@@ -5,7 +5,7 @@ import './globals.css';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'ドリームリアライザー | 夢を実現する第一歩',
+  title: 'Dream Step | 夢を実現する第一歩',
   description: 'AIと対話しながら夢を実現するためのステップを見つけましょう',
 };
 

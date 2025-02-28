@@ -1,30 +1,60 @@
-'use client'
+'use client';
 
 import { useState } from 'react';
-// import { useRouter } from 'next/navigation';
-import Head from 'next/head';
+import { useRouter } from 'next/navigation';
 
 export default function Home() {
   const [dream, setDream] = useState('');
-  // const router = useRouter();
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (dream.trim()) {
+    console.log("handleSubmit");
+    if (!dream.trim()) return;
+  try {
+    setLoading(true);
+    const res = await fetch('http://localhost:8000/api/yume_question', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:JSON.stringify({ Prompt: dream }),
+    });
+
+    console.log("Response status:", res.status);
+
+    if (res.ok) {
+      const data = await res.json();
+      console.log("API Response:", data);
+      
+      // ここでデータをセットせず、questionsページで取得するようにする
+      
+      // セッションストレージに夢を保存
+      sessionStorage.setItem('dream', dream);
+
+      if (data && data.Question) {
+        sessionStorage.setItem('questionData', JSON.stringify(data));
+      }
+      
+      router.push('/questions');
+    } else {
+      const errorData = await res.text();
+      console.error("API Error:", errorData);
+      alert('エラーが発生しました');
+      setLoading(false);
     }
-  };
+  } catch (error) {
+    console.error("Fetch Error:", error);
+    alert('通信エラーが発生しました');
+    setLoading(false);
+  }
+};
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-900 via-purple-700 to-pink-600">
-      <Head>
-        <title>Dream Step | 夢を実現する第一歩</title>
-        <meta name="description" content="AIと対話しながら夢を実現するためのステップを見つけましょう" />
-      </Head>
-
       <main className="container mx-auto px-4 py-16">
         <div className="max-w-2xl mx-auto">
           <div className="text-center mb-12">
-            <h1 className="text-4xl font-bold mb-4 text-white">ドリームリアライザー</h1>
+            <h1 className="text-4xl font-bold mb-4 text-white">Dream Step</h1>
             <p className="text-xl text-purple-100">AIと共に、夢への道筋を明確にしましょう</p>
           </div>
 
@@ -44,6 +74,9 @@ export default function Home() {
                   required
                 />
               </div>
+
+
+              
               <div className="flex justify-end">
                 <button
                   type="submit"
