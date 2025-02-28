@@ -1,20 +1,27 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-
-type Question = {
-  Question: string;
-  Answer: string;
-};
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import QAItem from "./QAItem";
 
 type Answers = {
   [key: number]: string;
 };
+type Question = {
+  Question: string;
+  Answer: string;
+};
+function LoadingSpinner() {
+  return (
+    <div className="flex justify-center py-6">
+      <div className="animate-spin h-10 w-10 border-t-2 border-gray-600 rounded-full"></div>
+    </div>
+  );
+}
 
 export default function Questions() {
   const router = useRouter();
-  const [dream, setDream] = useState<string>('');
+  const [dream, setDream] = useState<string>("");
   const [questions, setQuestions] = useState<Question[]>([]);
   const [answers, setAnswers] = useState<Answers>({});
   const [loading, setLoading] = useState(true);
@@ -22,25 +29,25 @@ export default function Questions() {
   const [dreamAnalysis, setDreamAnalysis] = useState<string | null>(null);
 
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const storedDream = sessionStorage.getItem('dream');
-      const storedQuestionData = sessionStorage.getItem('questionData');
-      
+    if (typeof window !== "undefined") {
+      const storedDream = sessionStorage.getItem("dream");
+      const storedQuestionData = sessionStorage.getItem("questionData");
+
       if (storedDream) {
         setDream(storedDream);
-        
+
         if (storedQuestionData) {
           try {
             const data = JSON.parse(storedQuestionData);
             console.log("セッションストレージから読み込んだデータ:", data);
-            
+
             if (data && data.Question && Array.isArray(data.Question)) {
               setQuestions(data.Question);
-              
+
               // 初期回答をLLMの回答に設定
-              const initialAnswers: {[key: number]: string} = {};
+              const initialAnswers: { [key: number]: string } = {};
               data.Question.forEach((q: any, index: number) => {
-                initialAnswers[index] = q.Anser || '';
+                initialAnswers[index] = q.Anser || "";
               });
               setAnswers(initialAnswers);
             } else {
@@ -52,128 +59,103 @@ export default function Questions() {
         } else {
           console.error("質問データがセッションストレージにありません");
         }
-        
+
         setLoading(false);
       } else {
         // 夢のデータがない場合はホーム画面に戻る
-        console.log("夢データがセッションストレージにないため、ホーム画面に戻ります");
-        router.push('/');
+        console.log(
+          "夢データがセッションストレージにないため、ホーム画面に戻ります"
+        );
+        router.push("/");
       }
     }
   }, [router]);
 
   const handleAnswerChange = (id: number, value: string) => {
-    setAnswers(prev => ({ ...prev, [id]: value }));
+    setAnswers((prev) => ({ ...prev, [id]: value }));
   };
 
-  const handleSave = async () => {
-    // 次へ進むボタンが押されたらローディング状態に
-    setProcessingNext(true);
-    
-    // 保存処理
-    sessionStorage.setItem('answers', JSON.stringify(answers));
-    
-    try {
-      // 時間がかかる処理をシミュレート
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      // 分析結果を設定
-      setDreamAnalysis("あなたの夢について具体的な計画を立てるための情報が集まりました...");
-    } catch (error) {
-      console.error("分析生成エラー:", error);
-    } finally {
-      // 処理完了後にローディング状態を解除
-      setProcessingNext(false);
-    }
+  const handleSave = () => {
+    // 回答をanswerから取得して、{Question:質問, Answer:回答}の形式に変換
+    const formattedQA = {
+      Answer: questions.map((q, index) => {
+        return {
+          Question: q.Question,
+          Answer: answers[index],
+        };
+      }),
+    };
+
+    sessionStorage.setItem("answers", JSON.stringify(answers));
+
+    // APIに回答する。
+    const DreamSummary = async () => {
+      setLoading(true);
+      try {
+        const res = await fetch(
+          process.env.NEXT_PUBLIC_API_URL + "api/yume_summary",
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(formattedQA),
+          }
+        );
+
+        res.json().then((data: { Analysis: string }) => {
+          setDreamAnalysis(data.Analysis);
+        });
+        setLoading(false);
+      } catch (error) {
+        console.error("Error fetching Yume data:", error);
+        return null;
+      }
+    };
+    DreamSummary();
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-purple-700 to-pink-600">
-      <main className="container mx-auto px-4 py-16">
-        <div className="max-w-3xl mx-auto">
-          <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold mb-2 text-white">あなたの夢を深掘りします</h1>
-            <p className="text-lg text-purple-100">以下の質問に答えることで、夢への理解が深まります</p>
-          </div>
-
-          <div className="bg-white bg-opacity-10 backdrop-blur-lg rounded-xl p-8 shadow-2xl border border-purple-300 border-opacity-20">
-            {loading ? (
-              <div className="flex justify-center items-center py-12">
-                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-pink-500"></div>
+    <div className="">
+      {loading ? (
+        <LoadingSpinner />
+      ) : (
+        <>
+          <div className="">
+            <div className="bg-rose-400 text-white text-center py-6 h-64 w-full">
+              <h1 className="text-4xl  font-bold">- あなたの夢を深掘り -</h1>
+              <div className="mt-4 mx-auto bg-white text-gray-700 font-semibold p-4 w-3/4 h-32 flex items-center justify-center rounded-md">
+                <p className="text-lg text-center">{dream}</p>
               </div>
-            ) : (
-              <>
-                <div className="mb-6">
-                  <h2 className="text-xl font-medium text-white mb-4">あなたの夢：</h2>
-                  <p className="text-purple-100 bg-purple-800 bg-opacity-30 p-4 rounded-lg">{dream}</p>
-                </div>
+            </div>
 
-                <div className="mb-8">
-                  <h2 className="text-xl font-medium text-white mb-4">以下の質問に回答してください：</h2>
-                  <div className="space-y-4">
-                    {questions && questions.length > 0 ? (
-                      questions.map((question, index) => (
-                        <div key={index} className="flex flex-col bg-purple-800 bg-opacity-20 border border-purple-400 border-opacity-20 p-4 rounded-lg">
-                          <p className="text-white mb-2">{question.Question}</p>
-                          <textarea
-                            className="w-full p-2 rounded-md bg-purple-900 bg-opacity-50 text-white border border-purple-300 focus:outline-none focus:ring-2 focus:ring-pink-400 placeholder-purple-300 placeholder-opacity-30 focus:border-transparent"
-                            value={answers[index] || ''}
-                            onChange={(e) => handleAnswerChange(index, e.target.value)}
-                            placeholder={question.Answer}
-                            rows={3}
-                          />
-                        </div>
-                      ))
-                    ) : (
-                      <p className="text-white">質問が読み込めませんでした。もう一度お試しください。</p>
-                    )}
-                  </div>
-                </div>
-
-                <div className="flex justify-end">
-                  <button
-                    onClick={handleSave}
-                    className="px-8 py-3 bg-gradient-to-r from-pink-500 to-purple-600 text-white font-medium rounded-full shadow-lg hover:from-pink-600 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-offset-2 transform transition hover:-translate-y-1"
-                    disabled={questions.length === 0 || processingNext}
-                  >
-                    {processingNext ? (
-                      <div className="flex items-center">
-                        <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white mr-2"></div>
-                        処理中...
-                      </div>
-                    ) : (
-                      "次へ進む"
-                    )}
-                  </button>
-                </div>
-
-                {processingNext && !dreamAnalysis && (
-                <div className="mt-8 flex justify-center items-center py-8">
-                  <div className="flex flex-col items-center">
-                    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-pink-500 mb-4"></div>
-                    <p className="text-white">夢の分析を生成しています...</p>
-                  </div>
+            <div className="space-y-4 w-3/5 mx-auto mt-4">
+              <div className="">
+                {questions.map((q,index) => (
+                  <QAItem
+                    key={index}
+                    question={q}
+                    answer={answers[q.id] || ""}
+                    onChange={handleAnswerChange}
+                  />
+                ))}
+              </div>
+              <button
+                onClick={handleSave}
+                className="px-16 py-4 bg-rose-400 text-white font-bold rounded-full mx-auto block mt-8"
+              >
+                回答を生成する
+              </button>
+              {dreamAnalysis && (
+                <div className="my-4 p-4 bg-gray-200 rounded-lg">
+                  <h2 className="text-gray-700 font-bold">
+                    夢の分析と具体化：
+                  </h2>
+                  <p className="text-gray-600 mt-2">{dreamAnalysis}</p>
                 </div>
               )}
-
-                {dreamAnalysis && (
-                  <div className="mt-8 p-6 bg-purple-800 bg-opacity-20 rounded-lg border border-purple-400 border-opacity-20 relative">
-                    <h2 className="text-xl font-medium text-white mb-4">夢の分析と具体化：</h2>
-                    <p className="text-white leading-relaxed">{dreamAnalysis}</p>
-                    <div className="flex justify-end mt-4">
-                      <button
-                        className="px-8 py-3 bg-gradient-to-r from-pink-500 to-purple-600 text-white font-medium rounded-full shadow-lg hover:from-pink-600 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-offset-2 transform transition hover:-translate-y-1"
-                      >
-                        タスクを生成
-                      </button>
-                    </div>
-                  </div>
-                )}
-              </>
-            )}
+            </div>
           </div>
-        </div>
-      </main>
+        </>
+      )}
     </div>
   );
 }
