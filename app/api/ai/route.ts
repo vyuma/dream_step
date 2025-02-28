@@ -1,9 +1,14 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { NextResponse } from "next/server";
 
-const genAI = new GoogleGenerativeAI("AIzaSyC81CIui393LUf0ZRmA4agGEhxnMvbDk7o");
+
 
 export async function POST(request: Request) {
+  if (!process.env.NEXT_PUBLIC_GOOGLE_API_KEY) {
+    return new NextResponse("API key not found", { status: 500 });
+  }
+  const genAI = new GoogleGenerativeAI(process.env.NEXT_PUBLIC_GOOGLE_API_KEY);
+  
   const encoder = new TextEncoder();
   const { prompt } = await request.json();
   const model = genAI.getGenerativeModel({ model: "gemini-2.0-pro-exp-02-05" });
