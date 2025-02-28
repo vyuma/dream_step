@@ -101,8 +101,9 @@ export default function Questions() {
           }
         );
 
-        res.json().then((data: { Analysis: string }) => {
-          setDreamAnalysis(data.Analysis);
+        res.json().then((data) => {
+          console.log("API Response:", data);
+          setDreamAnalysis(data.Summary);
         });
         setLoading(false);
       } catch (error) {

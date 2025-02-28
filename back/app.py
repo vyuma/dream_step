@@ -62,7 +62,8 @@ async def generate_yume_summery(yume_answer:YumeAnswer):
     yume_answer=yume_answer.model_dump()["Answer"]
     print(yume_answer)
     summary = yume_agent.generate_yume_summary_agent(yume_answer)
-    return summary
+    summary_json = { "Summary": summary}
+    return responses.JSONResponse(content=summary_json,media_type="application/json")
 
 @app.post("/api/get_object_and_tasks")
 async def generate_yume_object_and_tasks(yume_summary:YumeSummary):
