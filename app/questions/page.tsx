@@ -101,8 +101,9 @@ export default function Questions() {
           }
         );
 
-        res.json().then((data: { Analysis: string }) => {
-          setDreamAnalysis(data.Analysis);
+        res.json().then((data) => {
+          console.log("API Response:", data);
+          setDreamAnalysis(data.Summary);
         });
         setLoading(false);
       } catch (error) {
@@ -149,7 +150,7 @@ export default function Questions() {
                   <h2 className="text-gray-700 font-bold">
                     夢の分析と具体化：
                   </h2>
-                  <p className="text-gray-600 mt-2">{dreamAnalysis}</p>
+                  <rep className="text-gray-600 mt-2">{dreamAnalysis}</rep>
                 </div>
               )}
             </div>
