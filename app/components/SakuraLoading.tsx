@@ -24,7 +24,6 @@ const SakuraLoading: React.FC = () => {
     "https://adatype.co.jp/info/wp-content/uploads/2021/03/parts_04.png",
     "https://adatype.co.jp/info/wp-content/uploads/2021/03/parts_05.png",
     "https://adatype.co.jp/info/wp-content/uploads/2021/03/parts_06.png",
-
   ];
 
   return (
