@@ -150,7 +150,7 @@ export default function Questions() {
                   <h2 className="text-gray-700 font-bold">
                     夢の分析と具体化：
                   </h2>
-                  <p className="text-gray-600 mt-2">{dreamAnalysis}</p>
+                  <rep className="text-gray-600 mt-2">{dreamAnalysis}</rep>
                 </div>
               )}
             </div>
