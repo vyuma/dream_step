@@ -128,13 +128,13 @@ export default function Questions() {
             </div>
 
             <div className="space-y-4 w-3/5 mx-auto mt-4">
-              <div className="">
+              <div >
                 {questions.map((q,index) => (
                   <QAItem
                     key={index}
+                    index={index}
                     question={q}
-                    answer={answers[q.id] || ""}
-                    onChange={handleAnswerChange}
+                    handleAnswerChange={handleAnswerChange}
                   />
                 ))}
               </div>
