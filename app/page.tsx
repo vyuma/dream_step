@@ -78,7 +78,6 @@ export default function Home() {
               </form>
             </div>
           </div>
-
           <div className="w-full md:w-1/2 flex justify-center">
             <div className="relative">
               <img

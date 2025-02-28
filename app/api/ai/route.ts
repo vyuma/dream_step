@@ -4,10 +4,10 @@ import { NextResponse } from "next/server";
 
 
 export async function POST(request: Request) {
-  if (!process.env.NEXT_PUBLIC_GOOGLE_API_KEY) {
+  if (!process.env.GOOGLE_API_KEY) {
     return new NextResponse("API key not found", { status: 500 });
   }
-  const genAI = new GoogleGenerativeAI(process.env.NEXT_PUBLIC_GOOGLE_API_KEY);
+  const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY);
   
   const encoder = new TextEncoder();
   const { prompt } = await request.json();
