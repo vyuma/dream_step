@@ -82,7 +82,7 @@ export default function Home() {
                   type="submit"
                   className="px-8 py-3 bg-gradient-to-r from-pink-500 to-purple-600 text-white font-medium rounded-full shadow-lg hover:from-pink-600 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-offset-2 transform transition hover:-translate-y-1"
                 >
-                  次へ進む
+                  {loading ? "読み込み中..." : "次へ進む"}
                 </button>
               </div>
             </form>
