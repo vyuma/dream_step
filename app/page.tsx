@@ -84,9 +84,9 @@ export default function Home() {
           <div className="w-full md:w-1/2 flex justify-center">
             <div className="relative">
               <img
-                src="http:" // 画像URLをここに追加
+                src="../image.png" // 画像URLをここに追加
                 alt="Laptop with code"
-                className="rounded-lg shadow-2xl max-w-full h-auto"
+                className="max-w-full h-auto"
               />
             </div>
           </div>
